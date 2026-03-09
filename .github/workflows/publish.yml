@@ -1,0 +1,57 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@claude-nix-os'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate module manifest
+        run: |
+          node -e "
+            const manifest = require('./claudeos-module.json');
+            const pkg = require('./package.json');
+            if (manifest.name !== pkg.name) {
+              console.error('Module manifest name does not match package.json name');
+              process.exit(1);
+            }
+            if (manifest.version !== pkg.version) {
+              console.error('Module manifest version does not match package.json version');
+              process.exit(1);
+            }
+            console.log('Manifest and package.json are in sync');
+          "
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

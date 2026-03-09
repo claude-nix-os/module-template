@@ -1,0 +1,11 @@
+{
+  "name": "@claude-nix-os/module-TEMPLATE_NAME",
+  "version": "1.0.0",
+  "description": "TEMPLATE_DESCRIPTION",
+  "author": "",
+  "license": "MIT",
+  "repository": "https://github.com/claude-nix-os/module-TEMPLATE_NAME",
+  "requires": [],
+  "optional": [],
+  "main": "dist/index.js"
+}
